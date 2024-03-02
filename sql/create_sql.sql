@@ -1,7 +1,7 @@
 # 数据库初始化
-create database if not exists usercenter;
+create database if not exists springinit;
 
-use usercenter;
+use springinit;
 
 -- 用户表
 create table user
