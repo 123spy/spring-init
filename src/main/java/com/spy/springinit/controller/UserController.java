@@ -1,7 +1,6 @@
 package com.spy.springinit.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.gson.Gson;
 import com.spy.springinit.annotation.AuthCheck;
 import com.spy.springinit.common.BaseResponse;
 import com.spy.springinit.common.DeleteRequest;
@@ -10,8 +9,8 @@ import com.spy.springinit.common.ResultUtils;
 import com.spy.springinit.constant.UserConstant;
 import com.spy.springinit.exception.BusinessException;
 import com.spy.springinit.model.domain.User;
-import com.spy.springinit.model.dto.UserQueryRequest;
-import com.spy.springinit.model.request.*;
+import com.spy.springinit.model.dto.user.UserQueryRequest;
+import com.spy.springinit.model.dto.user.*;
 import com.spy.springinit.model.vo.UserVO;
 import com.spy.springinit.service.UserService;
 import com.spy.springinit.utils.AccountUtils;
@@ -83,7 +82,6 @@ public class UserController {
         return ResultUtils.success(userService.getUserVO(user));
     }
 
-    // todo 管理员接口
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
@@ -100,7 +98,6 @@ public class UserController {
         return ResultUtils.success(id);
     }
 
-    // todo 管理员接口
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
@@ -116,20 +113,14 @@ public class UserController {
         return ResultUtils.success(true);
     }
 
-    // todo 管理员接口
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         if (userUpdateRequest == null || userUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        List<String> tagList = userUpdateRequest.getTags();
-        Gson gson = new Gson();
-        String tagListStr = gson.toJson(tagList);
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
-        // 更新标签
-        user.setTags(tagListStr);
         String userPassword = userUpdateRequest.getUserPassword();
         if (!AccountUtils.checkUserPassword(userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码非法");
@@ -143,7 +134,6 @@ public class UserController {
         return ResultUtils.success(true);
     }
 
-    // todo 管理员接口
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(long id, HttpServletRequest request) {
@@ -152,12 +142,11 @@ public class UserController {
         }
         User user = userService.getById(id);
         if (user == null) {
-            throw new BusinessException(ErrorCode.NULL_ERROR);
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         return ResultUtils.success(user);
     }
 
-    // todo 管理员接口
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
         if (id <= 0) {
@@ -165,12 +154,11 @@ public class UserController {
         }
         User user = userService.getById(id);
         if (user == null) {
-            throw new BusinessException(ErrorCode.NULL_ERROR);
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         return ResultUtils.success(userService.getUserVO(user));
     }
 
-    // todo 管理员接口
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<User>> listUserByPage(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
@@ -183,7 +171,6 @@ public class UserController {
         return ResultUtils.success(userPage);
     }
 
-    // todo 管理员接口
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
         if (userQueryRequest == null) {
@@ -199,7 +186,6 @@ public class UserController {
         return ResultUtils.success(userVOPage);
     }
 
-    // todo 管理员接口
     @PostMapping("/update/my")
     public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
                                               HttpServletRequest request) {
@@ -208,9 +194,23 @@ public class UserController {
         }
         User loginUser = userService.getLoginUser(request);
         User user = new User();
+        // todo 添加校验字段
         BeanUtils.copyProperties(userUpdateMyRequest, user);
         user.setId(loginUser.getId());
         boolean result = userService.updateById(user);
+        if (!result) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
+        return ResultUtils.success(true);
+    }
+
+    @PostMapping("/delete/my")
+    public BaseResponse<Boolean> deleteMyUser(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        if (loginUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        boolean result = userService.removeById(loginUser.getId());
         if (!result) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }

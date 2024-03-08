@@ -5,8 +5,8 @@
     <groupId>com.spy</groupId>
     <artifactId>springinit-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springinit-backend</name>
-    <description>springinit-backend</description>
+    <name>spring-init-backend</name>
+    <description>spring-init-backend</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -9,12 +9,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 用户
- * @TableName user
+ * 帖子
+ * @TableName post
  */
-@TableName(value ="user")
+@TableName(value ="post")
 @Data
-public class User implements Serializable {
+public class Post implements Serializable {
     /**
      * id
      */
@@ -22,34 +22,29 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称
+     * 标题
      */
-    private String userName;
+    private String title;
 
     /**
-     * 账号
+     * 内容
      */
-    private String userAccount;
+    private String content;
 
     /**
-     * 用户头像
+     * 标签列表（json 数组）
      */
-    private String avatarUrl;
+    private String tags;
 
     /**
-     * 密码
+     * 点赞数
      */
-    private String userPassword;
+    private Integer thumbNum;
 
     /**
-     * 电话
+     * 创建用户 id
      */
-    private String userProfile;
-
-    /**
-     * 用户角色 user - 普通用户 admin - 管理员 ban - 禁号
-     */
-    private String userRole;
+    private Long userId;
 
     /**
      * 创建时间
@@ -57,7 +52,7 @@ public class User implements Serializable {
     private Date createTime;
 
     /**
-     *
+     * 更新时间
      */
     private Date updateTime;
 

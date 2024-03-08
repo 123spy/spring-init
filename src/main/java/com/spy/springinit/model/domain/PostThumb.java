@@ -9,47 +9,27 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 用户
- * @TableName user
+ * 帖子点赞
+ * @TableName post_thumb
  */
-@TableName(value ="user")
+@TableName(value ="post_thumb")
 @Data
-public class User implements Serializable {
+public class PostThumb implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户昵称
+     * 帖子 id
      */
-    private String userName;
+    private Long postId;
 
     /**
-     * 账号
+     * 创建用户 id
      */
-    private String userAccount;
-
-    /**
-     * 用户头像
-     */
-    private String avatarUrl;
-
-    /**
-     * 密码
-     */
-    private String userPassword;
-
-    /**
-     * 电话
-     */
-    private String userProfile;
-
-    /**
-     * 用户角色 user - 普通用户 admin - 管理员 ban - 禁号
-     */
-    private String userRole;
+    private Long userId;
 
     /**
      * 创建时间
@@ -57,14 +37,9 @@ public class User implements Serializable {
     private Date createTime;
 
     /**
-     *
+     * 更新时间
      */
     private Date updateTime;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDelete;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

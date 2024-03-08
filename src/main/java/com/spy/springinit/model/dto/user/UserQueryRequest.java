@@ -1,4 +1,4 @@
-package com.spy.springinit.model.dto;
+package com.spy.springinit.model.dto.user;
 
 import com.spy.springinit.common.PageRequest;
 import lombok.Data;

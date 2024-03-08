@@ -2,13 +2,12 @@ package com.spy.springinit.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.spy.springinit.common.ErrorCode;
 import com.spy.springinit.constant.CommonConstant;
 import com.spy.springinit.exception.BusinessException;
 import com.spy.springinit.model.domain.User;
-import com.spy.springinit.model.dto.UserQueryRequest;
+import com.spy.springinit.model.dto.user.UserQueryRequest;
+import com.spy.springinit.model.enums.UserRoleEnum;
 import com.spy.springinit.model.vo.UserVO;
 import com.spy.springinit.service.UserService;
 import com.spy.springinit.mapper.UserMapper;
@@ -125,9 +124,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserName(originUser.getUserName());
         safetyUser.setUserAccount(originUser.getUserAccount());
         safetyUser.setAvatarUrl(originUser.getAvatarUrl());
-        safetyUser.setPhone(originUser.getPhone());
+        safetyUser.setUserProfile(originUser.getUserProfile());
         safetyUser.setUserRole(originUser.getUserRole());
-        safetyUser.setTags(originUser.getTags());
         safetyUser.setCreateTime(originUser.getCreateTime());
         safetyUser.setUpdateTime(originUser.getUpdateTime());
         return safetyUser;
@@ -138,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN);
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
@@ -151,13 +149,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN);
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
         currentUser = this.getById(userId);
         if (currentUser == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN);
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         return currentUser;
     }
@@ -169,15 +167,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
-        // 设置标签
-        String tagStr = user.getTags();
-        Gson gson = new Gson();
-        List<String> tagList = new ArrayList<>();
-        if (StringUtils.isNotBlank(tagStr)) {
-            tagList = gson.fromJson(tagStr, new TypeToken<List<String>>() {
-            }.getType());
-        }
-        userVO.setTags(tagList);
         return userVO;
     }
 
@@ -242,6 +231,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             this.save(user);
             return user.getId();
         }
+    }
+
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        // 仅管理员可查询
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return isAdmin(user);
+    }
+
+    @Override
+    public boolean isAdmin(User user) {
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
+    }
+
+    @Override
+    public User getLoginUserPermitNull(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getId() == null) {
+            return null;
+        }
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        long userId = currentUser.getId();
+        return this.getById(userId);
     }
 }
 

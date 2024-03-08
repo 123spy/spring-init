@@ -1,4 +1,4 @@
-package com.spy.springinit.model.request;
+package com.spy.springinit.model.dto.user;
 
 import lombok.Data;
 
@@ -36,12 +36,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 电话
      */
-    private String phone;
-
-    /**
-     * 标签 json 列表
-     */
-    private List<String> tags;
+    private String userProfile;
 
     /**
      * 用户角色 user - 普通用户 admin - 管理员 ban - 禁号

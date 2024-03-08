@@ -31,17 +31,12 @@ public class UserVO implements Serializable {
     /**
      * 电话
      */
-    private String phone;
+    private String userProfile;
 
     /**
      * 用户角色 user - 普通用户 admin - 管理员 ban - 禁号
      */
     private String userRole;
-
-    /**
-     * 标签 json 列表
-     */
-    private List<String> tags;
 
     /**
      * 创建时间

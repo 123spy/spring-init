@@ -1,9 +1,11 @@
 package com.spy.springinit.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.spy.springinit.model.domain.Post;
 import com.spy.springinit.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.spy.springinit.model.dto.UserQueryRequest;
+import com.spy.springinit.model.dto.user.UserQueryRequest;
+import com.spy.springinit.model.vo.PostVO;
 import com.spy.springinit.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
@@ -92,4 +94,28 @@ public interface UserService extends IService<User> {
      * @return
      */
     Long addUser(String username, String userAccount);
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    boolean isAdmin(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     *
+     * @param user
+     * @return
+     */
+    boolean isAdmin(User user);
+
+    /**
+     * 获取登录用户（允许未登录）
+     *
+     * @param request
+     * @return
+     */
+    User getLoginUserPermitNull(HttpServletRequest request);
 }
